@@ -32,7 +32,6 @@ public class MainActivity extends Activity {
         webSettings.setAllowFileAccess(true);
         webSettings.setAllowContentAccess(true);
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         
         // Set WebView client to handle page navigation
         webView.setWebViewClient(new WebViewClient() {
