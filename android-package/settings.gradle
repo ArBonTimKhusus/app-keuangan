@@ -1,0 +1,2 @@
+rootProject.name = "ArBonKas"
+include ':app'

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ArBonKas - Aplikasi Laporan Keuangan untuk ArBon Carbon Modifikasi">
+    <title>ArBonKas - Aplikasi Laporan Keuangan</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>ArBonKas</h1>
+                <p class="tagline">Aplikasi Laporan Keuangan</p>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-page="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transaksi</span>
+                </button>
+                <button class="nav-btn" data-page="wallets">
+                    <i class="fas fa-wallet"></i>
+                    <span>Dompet</span>
+                </button>
+                <button class="nav-btn" data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Laporan</span>
+                </button>
+                <button class="nav-btn" data-page="loans">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Hutang/Piutang</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                    <button class="btn btn-primary" id="quick-add-btn">
+                        <i class="fas fa-plus"></i> Tambah Cepat
+                    </button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Balance Cards -->
+                    <div class="card balance-card income-card">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Pemasukan</h3>
+                            <p class="amount" id="total-income">Rp 0</p>
+                        </div>
+                    </div>
+
+                    <div class="card balance-card expense-card">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Pengeluaran</h3>
+                            <p class="amount" id="total-expense">Rp 0</p>
+                        </div>
+                    </div>
+
+                    <div class="card balance-card balance-total-card">
+                        <div class="card-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Saldo Total</h3>
+                            <p class="amount" id="total-balance">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card recent-transactions">
+                    <h3>Transaksi Terakhir</h3>
+                    <div id="recent-transactions-list" class="transactions-list">
+                        <p class="empty-state">Belum ada transaksi</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transactions Page -->
+            <section id="transactions-page" class="page">
+                <div class="page-header">
+                    <h2>Transaksi</h2>
+                    <div class="filter-group">
+                        <select id="transaction-filter" class="form-select">
+                            <option value="all">Semua</option>
+                            <option value="income">Pemasukan</option>
+                            <option value="expense">Pengeluaran</option>
+                        </select>
+                        <button class="btn btn-primary" id="add-transaction-btn">
+                            <i class="fas fa-plus"></i> Tambah Transaksi
+                        </button>
+                    </div>
+                </div>
+
+                <div id="transactions-list" class="transactions-list">
+                    <p class="empty-state">Belum ada transaksi</p>
+                </div>
+            </section>
+
+            <!-- Wallets Page -->
+            <section id="wallets-page" class="page">
+                <div class="page-header">
+                    <h2>Dompet</h2>
+                    <button class="btn btn-primary" id="add-wallet-btn">
+                        <i class="fas fa-plus"></i> Tambah Dompet
+                    </button>
+                </div>
+
+                <div id="wallets-list" class="wallets-grid">
+                    <!-- Wallets will be displayed here -->
+                </div>
+            </section>
+
+            <!-- Reports Page -->
+            <section id="reports-page" class="page">
+                <div class="page-header">
+                    <h2>Laporan Keuangan</h2>
+                    <button class="btn btn-secondary" id="export-report-btn">
+                        <i class="fas fa-download"></i> Ekspor PDF
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="report-filters">
+                        <div class="form-group">
+                            <label>Periode:</label>
+                            <select id="report-period" class="form-select">
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month" selected>Bulan Ini</option>
+                                <option value="year">Tahun Ini</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="form-group custom-date-range" style="display: none;">
+                            <label>Dari:</label>
+                            <input type="date" id="report-start-date" class="form-input">
+                            <label>Sampai:</label>
+                            <input type="date" id="report-end-date" class="form-input">
+                        </div>
+                        <button class="btn btn-primary" id="generate-report-btn">Generate</button>
+                    </div>
+                </div>
+
+                <div class="report-summary">
+                    <div class="card">
+                        <h3>Ringkasan Keuangan</h3>
+                        <div id="report-summary-content">
+                            <p class="empty-state">Pilih periode dan klik Generate untuk melihat laporan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Detail Transaksi</h3>
+                    <div id="report-transactions-list" class="transactions-list">
+                        <p class="empty-state">Belum ada data</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loans Page -->
+            <section id="loans-page" class="page">
+                <div class="page-header">
+                    <h2>Hutang & Piutang</h2>
+                    <button class="btn btn-primary" id="add-loan-btn">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                </div>
+
+                <div class="loans-tabs">
+                    <button class="tab-btn active" data-tab="receivables">
+                        <i class="fas fa-hand-holding-usd"></i> Piutang
+                    </button>
+                    <button class="tab-btn" data-tab="payables">
+                        <i class="fas fa-money-bill-wave"></i> Hutang
+                    </button>
+                </div>
+
+                <div id="receivables-tab" class="tab-content active">
+                    <div id="receivables-list" class="loans-list">
+                        <p class="empty-state">Belum ada piutang</p>
+                    </div>
+                </div>
+
+                <div id="payables-tab" class="tab-content">
+                    <div id="payables-list" class="loans-list">
+                        <p class="empty-state">Belum ada hutang</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal: Add Transaction -->
+    <div id="transaction-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transaction-modal-title">Tambah Transaksi</h3>
+                <button class="close-btn" data-modal="transaction-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-id">
+                <div class="form-group">
+                    <label>Tipe:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="income" checked>
+                            <span>Pemasukan</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="expense">
+                            <span>Pengeluaran</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah (Rp):</label>
+                    <input type="number" id="transaction-amount" class="form-input" required min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <input type="text" id="transaction-category" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Dompet:</label>
+                    <select id="transaction-wallet" class="form-select" required>
+                        <option value="">Pilih Dompet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal:</label>
+                    <input type="date" id="transaction-date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Catatan:</label>
+                    <textarea id="transaction-note" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="transaction-modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Wallet -->
+    <div id="wallet-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tambah Dompet</h3>
+                <button class="close-btn" data-modal="wallet-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="wallet-form">
+                <div class="form-group">
+                    <label>Nama Dompet:</label>
+                    <input type="text" id="wallet-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Saldo Awal (Rp):</label>
+                    <input type="number" id="wallet-balance" class="form-input" required min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Ikon:</label>
+                    <select id="wallet-icon" class="form-select">
+                        <option value="wallet">Dompet</option>
+                        <option value="credit-card">Kartu Kredit</option>
+                        <option value="university">Bank</option>
+                        <option value="piggy-bank">Tabungan</option>
+                        <option value="money-bill">Uang Tunai</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="wallet-modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Loan -->
+    <div id="loan-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tambah Hutang/Piutang</h3>
+                <button class="close-btn" data-modal="loan-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="loan-form">
+                <div class="form-group">
+                    <label>Tipe:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="loan-type" value="receivable" checked>
+                            <span>Piutang (Orang lain berhutang ke saya)</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="loan-type" value="payable">
+                            <span>Hutang (Saya berhutang ke orang lain)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nama:</label>
+                    <input type="text" id="loan-name" class="form-input" required placeholder="Nama orang/perusahaan">
+                </div>
+                <div class="form-group">
+                    <label>Jumlah (Rp):</label>
+                    <input type="number" id="loan-amount" class="form-input" required min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Tanggal:</label>
+                    <input type="date" id="loan-date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Jatuh Tempo:</label>
+                    <input type="date" id="loan-due-date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Catatan:</label>
+                    <textarea id="loan-note" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="loan-modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ArBonKas - <a href="https://www.arboncarbonmodifikasi.com" target="_blank">ArBon Carbon Modifikasi</a></p>
+            <p class="footer-note">Data disimpan lokal di perangkat Anda. Privasi terjamin.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
