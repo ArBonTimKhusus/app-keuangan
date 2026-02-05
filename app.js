@@ -445,7 +445,7 @@
             const cell = document.createElement('td');
             cell.colSpan = 6;
             cell.style.cssText = 'text-align:center;padding:20px;font-style:italic;color:#888;';
-            cell.textContent = `Tampil ${AppConfig.limits.displayRows} dari ${dataStore.transactionLog.length} data`;
+            cell.textContent = `Menampilkan ${AppConfig.limits.displayRows} dari ${dataStore.transactionLog.length} catatan`;
             row.appendChild(cell);
             return row;
         }
@@ -717,7 +717,7 @@
                 s2.addText(`Saldo: ${FormatService.money(stats.balance)}`, { x: 1, y: 3.6, w: 8, h: 0.5, fontSize: 28, color: '2980b9', bold: true });
 
                 const s3 = ppt.addSlide();
-                s3.addText('Detail Transaksi', { x: 0.5, y: 0.5, w: 9, h: 0.5, fontSize: 24, bold: true, color: '667eea' });
+                s3.addText('Detail Catatan Keuangan', { x: 0.5, y: 0.5, w: 9, h: 0.5, fontSize: 24, bold: true, color: '667eea' });
 
                 const tblData = [
                     [
@@ -742,7 +742,7 @@
                 s3.addTable(tblData, { x: 0.5, y: 1.2, w: 9, fontSize: 10, border: { pt: 1, color: 'CCCCCC' } });
 
                 if (dataStore.transactionLog.length > 10) {
-                    s3.addText(`* Tampil 10 dari ${dataStore.transactionLog.length} data`, { x: 0.5, y: 5.2, w: 9, h: 0.3, fontSize: 10, color: '999999', italic: true });
+                    s3.addText(`* Menampilkan 10 dari ${dataStore.transactionLog.length} catatan`, { x: 0.5, y: 5.2, w: 9, h: 0.3, fontSize: 10, color: '999999', italic: true });
                 }
 
                 ppt.writeFile({ fileName: 'laporan-keuangan.pptx' });
