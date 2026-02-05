@@ -38,8 +38,8 @@
         initialize() {
             const stored = this._retrieveFromStorage();
             if (stored) {
-                this.categoryList = stored.cats || this._getDefaultCategories();
-                this.transactionLog = stored.trans || [];
+                this.categoryList = stored.categories || this._getDefaultCategories();
+                this.transactionLog = stored.transactions || [];
             } else {
                 this.categoryList = this._getDefaultCategories();
                 this.transactionLog = [];
@@ -69,8 +69,8 @@
             this.pendingSave = setTimeout(() => {
                 try {
                     const payload = {
-                        cats: this.categoryList,
-                        trans: this.transactionLog
+                        categories: this.categoryList,
+                        transactions: this.transactionLog
                     };
                     localStorage.setItem(AppConfig.storage.mainKey, JSON.stringify(payload));
                 } catch (e) {
@@ -87,8 +87,8 @@
             try {
                 const snapshot = {
                     time: new Date().toISOString(),
-                    cats: [...this.categoryList],
-                    trans: [...this.transactionLog]
+                    categories: [...this.categoryList],
+                    transactions: [...this.transactionLog]
                 };
                 localStorage.setItem(AppConfig.storage.snapshotKey, JSON.stringify(snapshot));
                 NotificationService.alert('Snapshot berhasil', 'success');
@@ -108,8 +108,8 @@
                 }
 
                 const snapshot = JSON.parse(raw);
-                this.categoryList = snapshot.cats;
-                this.transactionLog = snapshot.trans;
+                this.categoryList = snapshot.categories;
+                this.transactionLog = snapshot.transactions;
                 this.persist();
                 NotificationService.alert('Snapshot dipulihkan', 'success');
                 return true;
@@ -212,9 +212,8 @@
 
         static generateId() {
             const stamp = Date.now();
-            const rand = Math.random().toString(36).slice(2, 11);
-            const extra = Math.random().toString(36).slice(2, 6);
-            return `${stamp}-${rand}${extra}`;
+            const rand = Math.random().toString(36).slice(2, 15);
+            return `${stamp}-${rand}`;
         }
     }
 
@@ -252,7 +251,7 @@
         }
 
         static categoryInUse(name) {
-            return dataStore.transactionLog.some(t => t.cat === name);
+            return dataStore.transactionLog.some(t => t.category === name);
         }
     }
 
@@ -348,12 +347,12 @@
             }
 
             const entry = {
-                uid: SecurityHelper.generateId(),
-                dt: fields.dt.value,
-                typ: fields.typ.value,
-                cat: fields.cat.value,
-                amt: amount,
-                desc: SecurityHelper.clean(fields.desc.value.trim())
+                id: SecurityHelper.generateId(),
+                date: fields.dt.value,
+                type: fields.typ.value,
+                category: fields.cat.value,
+                amount: amount,
+                description: SecurityHelper.clean(fields.desc.value.trim())
             };
 
             dataStore.transactionLog.unshift(entry);
@@ -364,9 +363,9 @@
             NotificationService.alert('Transaksi ditambahkan', 'success');
         }
 
-        static remove(uid) {
+        static remove(id) {
             if (confirm('Hapus transaksi?')) {
-                dataStore.transactionLog = dataStore.transactionLog.filter(t => t.uid !== uid);
+                dataStore.transactionLog = dataStore.transactionLog.filter(t => t.id !== id);
                 dataStore.persist();
                 this.renderAll();
                 SummaryController.update();
@@ -404,12 +403,12 @@
             const row = document.createElement('tr');
 
             const cells = [
-                this._makeCell(FormatService.date(item.dt)),
-                this._makeCell(item.cat),
-                this._makeTypeBadge(item.typ),
-                this._makeCell(item.desc || '-'),
-                this._makeCell(FormatService.money(item.amt)),
-                this._makeActionCell(item.uid)
+                this._makeCell(FormatService.date(item.date)),
+                this._makeCell(item.category),
+                this._makeTypeBadge(item.type),
+                this._makeCell(item.description || '-'),
+                this._makeCell(FormatService.money(item.amount)),
+                this._makeActionCell(item.id)
             ];
 
             cells.forEach(cell => row.appendChild(cell));
@@ -431,12 +430,12 @@
             return cell;
         }
 
-        static _makeActionCell(uid) {
+        static _makeActionCell(id) {
             const cell = document.createElement('td');
             const btn = document.createElement('button');
             btn.className = 'delete-record-btn';
             btn.textContent = 'Hapus';
-            btn.onclick = () => this.remove(uid);
+            btn.onclick = () => this.remove(id);
             cell.appendChild(btn);
             return cell;
         }
@@ -486,10 +485,10 @@
             let outgoing = 0;
 
             dataStore.transactionLog.forEach(t => {
-                if (t.typ === 'pemasukan') {
-                    incoming += t.amt;
+                if (t.type === 'pemasukan') {
+                    incoming += t.amount;
                 } else {
-                    outgoing += t.amt;
+                    outgoing += t.amount;
                 }
             });
 
@@ -566,11 +565,11 @@
                 pdf.text(`Saldo: ${FormatService.money(stats.balance)}`, 14, 60);
 
                 const rows = dataStore.transactionLog.map(t => [
-                    FormatService.date(t.dt),
-                    t.cat,
-                    t.typ,
-                    t.desc || '-',
-                    FormatService.money(t.amt)
+                    FormatService.date(t.date),
+                    t.category,
+                    t.type,
+                    t.description || '-',
+                    FormatService.money(t.amount)
                 ]);
 
                 pdf.autoTable({
@@ -600,11 +599,11 @@
 
                 const stats = SummaryController._calculate();
                 const rows = dataStore.transactionLog.map(t => ({
-                    'Tanggal': t.dt,
-                    'Kategori': t.cat,
-                    'Tipe': t.typ,
-                    'Deskripsi': t.desc || '-',
-                    'Jumlah': t.amt
+                    'Tanggal': t.date,
+                    'Kategori': t.category,
+                    'Tipe': t.type,
+                    'Deskripsi': t.description || '-',
+                    'Jumlah': t.amount
                 }));
 
                 rows.push({});
@@ -654,11 +653,11 @@
                     rows.push(
                         new TableRow({
                             children: [
-                                new TableCell({ children: [new Paragraph(FormatService.date(t.dt))] }),
-                                new TableCell({ children: [new Paragraph(t.cat)] }),
-                                new TableCell({ children: [new Paragraph(t.typ)] }),
-                                new TableCell({ children: [new Paragraph(t.desc || '-')] }),
-                                new TableCell({ children: [new Paragraph(FormatService.money(t.amt))] }),
+                                new TableCell({ children: [new Paragraph(FormatService.date(t.date))] }),
+                                new TableCell({ children: [new Paragraph(t.category)] }),
+                                new TableCell({ children: [new Paragraph(t.type)] }),
+                                new TableCell({ children: [new Paragraph(t.description || '-')] }),
+                                new TableCell({ children: [new Paragraph(FormatService.money(t.amount))] }),
                             ],
                         })
                     );
@@ -732,11 +731,11 @@
 
                 dataStore.transactionLog.slice(0, 10).forEach(t => {
                     tblData.push([
-                        FormatService.date(t.dt),
-                        t.cat,
-                        t.typ,
-                        t.desc || '-',
-                        FormatService.money(t.amt)
+                        FormatService.date(t.date),
+                        t.category,
+                        t.type,
+                        t.description || '-',
+                        FormatService.money(t.amount)
                     ]);
                 });
 
@@ -764,7 +763,7 @@
                 let output = 'Tanggal,Kategori,Tipe,Deskripsi,Jumlah\n';
 
                 dataStore.transactionLog.forEach(t => {
-                    const line = [t.dt, t.cat, t.typ, t.desc || '-', t.amt];
+                    const line = [t.date, t.category, t.type, t.description || '-', t.amount];
                     output += line.map(f => `"${f}"`).join(',') + '\n';
                 });
 
@@ -841,7 +840,7 @@
     window.addCategory = () => CategoryController.add();
     window.deleteCategory = (name) => CategoryController.remove(name);
     window.addRecord = () => TransactionController.add();
-    window.deleteRecord = (uid) => TransactionController.remove(uid);
+    window.deleteRecord = (id) => TransactionController.remove(id);
     window.exportToPDF = () => ExportManager.toPDF();
     window.exportToExcel = () => ExportManager.toExcel();
     window.exportToWord = () => ExportManager.toWord();
