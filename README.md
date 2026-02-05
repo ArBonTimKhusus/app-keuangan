@@ -17,10 +17,13 @@ Aplikasi manajemen keuangan berbasis web dengan fitur kategori dan ekspor multi-
 
 ### 3. Ekspor Data
 Ekspor laporan keuangan ke berbagai format:
+- 📊 **CSV** - Format universal, bekerja offline (Recommended)
 - 📄 **PDF** - Format profesional untuk laporan
 - 📊 **Excel** - Untuk analisis lebih lanjut
 - 📝 **Word** - Dokumen yang dapat diedit
 - 📽️ **PowerPoint** - Presentasi laporan keuangan
+
+**Catatan:** Export PDF, Excel, Word, dan PowerPoint memerlukan koneksi internet untuk mengunduh library. Jika offline atau library tidak dapat dimuat, gunakan export CSV sebagai alternatif.
 
 ## 🚀 Cara Menggunakan
 

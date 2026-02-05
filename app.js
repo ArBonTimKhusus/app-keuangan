@@ -200,6 +200,11 @@ function formatDate(dateStr) {
 
 // Export Functions
 function exportToPDF() {
+    if (typeof window.jspdf === 'undefined') {
+        alert('Library PDF tidak dapat dimuat. Pastikan ada koneksi internet atau gunakan export CSV sebagai alternatif.');
+        exportToCSV();
+        return;
+    }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
@@ -243,6 +248,11 @@ function exportToPDF() {
 }
 
 function exportToExcel() {
+    if (typeof XLSX === 'undefined') {
+        alert('Library Excel tidak dapat dimuat. Pastikan ada koneksi internet atau gunakan export CSV sebagai alternatif.');
+        exportToCSV();
+        return;
+    }
     const data = records.map(record => ({
         'Tanggal': record.date,
         'Kategori': record.category,
@@ -296,6 +306,11 @@ function exportToExcel() {
 }
 
 function exportToWord() {
+    if (typeof docx === 'undefined') {
+        alert('Library Word tidak dapat dimuat. Pastikan ada koneksi internet atau gunakan export CSV sebagai alternatif.');
+        exportToCSV();
+        return;
+    }
     const { Document, Paragraph, TextRun, Table, TableCell, TableRow, WidthType } = docx;
     
     let totalPemasukan = 0;
@@ -395,6 +410,11 @@ function exportToWord() {
 }
 
 function exportToPPT() {
+    if (typeof PptxGenJS === 'undefined') {
+        alert('Library PowerPoint tidak dapat dimuat. Pastikan ada koneksi internet atau gunakan export CSV sebagai alternatif.');
+        exportToCSV();
+        return;
+    }
     const pptx = new PptxGenJS();
     
     // Title Slide
@@ -521,4 +541,44 @@ function exportToPPT() {
     }
     
     pptx.writeFile({ fileName: 'laporan-keuangan.pptx' });
+}
+
+// CSV Export (fallback that doesn't require external libraries)
+function exportToCSV() {
+    // Prepare CSV content
+    let csvContent = 'Tanggal,Kategori,Tipe,Deskripsi,Jumlah\n';
+    
+    records.forEach(record => {
+        const row = [
+            record.date,
+            record.category,
+            record.type,
+            record.description || '-',
+            record.amount
+        ];
+        csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+    });
+    
+    // Add summary
+    let totalPemasukan = 0;
+    let totalPengeluaran = 0;
+    records.forEach(record => {
+        if (record.type === 'pemasukan') totalPemasukan += record.amount;
+        else totalPengeluaran += record.amount;
+    });
+    
+    csvContent += '\n';
+    csvContent += 'RINGKASAN\n';
+    csvContent += `Total Pemasukan,,,,${totalPemasukan}\n`;
+    csvContent += `Total Pengeluaran,,,,${totalPengeluaran}\n`;
+    csvContent += `Saldo,,,,${totalPemasukan - totalPengeluaran}\n`;
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'laporan-keuangan.csv';
+    link.click();
+    window.URL.revokeObjectURL(url);
 }
