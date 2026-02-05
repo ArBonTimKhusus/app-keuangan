@@ -38,7 +38,6 @@ public class MainActivity extends Activity {
         
         // Set WebView client to handle page navigation
         webView.setWebViewClient(new WebViewClient() {
-        webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
