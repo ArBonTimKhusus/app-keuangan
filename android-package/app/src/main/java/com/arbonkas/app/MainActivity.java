@@ -35,10 +35,9 @@ public class MainActivity extends Activity {
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         
         // Enable localStorage
-        String databasePath = this.getApplicationContext().getDir("databases", MODE_PRIVATE).getPath();
-        webSettings.setDatabasePath(databasePath);
         
         // Set WebView client to handle page navigation
+        webView.setWebViewClient(new WebViewClient() {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
