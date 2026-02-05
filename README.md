@@ -1,4 +1,4 @@
-# 📊 Aplikasi Keuangan
+# <img width="234" height="280" alt="image" src="https://github.com/user-attachments/assets/09662103-b863-4feb-be1f-b6b69107a7fe" />Aplikasi laporan Keuangan
 
 Aplikasi manajemen keuangan berbasis web dengan fitur kategori dan ekspor multi-format.
 
