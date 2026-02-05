@@ -20,7 +20,7 @@ The ArBonKas Android app has been enhanced with performance optimizations, secur
 - **Hardware Acceleration**: Enabled for smooth rendering performance
 - **Caching Strategy**: Implements `LOAD_CACHE_ELSE_NETWORK` for offline capability
 - **Lifecycle Management**: Proper handling of `onPause`, `onResume`, `onDestroy`, and `onLowMemory` events
-- **Memory Management**: Automatic cache clearing and garbage collection on low memory
+- **Memory Management**: Automatic cache clearing on low memory events
 - **Error Handling**: Graceful fallback to error page when content unavailable
 - **Back Button Support**: Navigate through WebView history before exiting
 
@@ -32,7 +32,7 @@ The ArBonKas Android app has been enhanced with performance optimizations, secur
 
 **Performance Optimizations**:
 - Hardware-accelerated rendering
-- Efficient caching with app cache
+- Efficient caching with LOAD_CACHE_ELSE_NETWORK strategy
 - DOM storage and database enabled for localStorage
 - Scroll bar optimization with overlay style
 
@@ -189,6 +189,8 @@ The app is configured for:
 - Target SDK: Latest stable Android version
 - Build Tools: Latest Android build tools
 
+**Note**: Some caching APIs (setAppCachePath, setAppCacheEnabled) are deprecated in API 33+. For newer Android versions, these will be ignored by the system. The app primarily relies on the LOAD_CACHE_ELSE_NETWORK strategy which remains supported.
+
 ## Dependencies
 
 No external dependencies required beyond standard Android SDK.
@@ -200,6 +202,7 @@ No external dependencies required beyond standard Android SDK.
 - Security-first approach with URL filtering
 - Performance-optimized with caching and hardware acceleration
 - User-friendly with splash screen and progress indication
+- Memory management handled automatically by Android runtime
 
 ---
 

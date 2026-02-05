@@ -273,7 +273,6 @@ public class MainActivity extends Activity {
         if (engine != null) {
             engine.freeMemory();
             engine.clearCache(true);
-            System.gc();
         }
     }
 

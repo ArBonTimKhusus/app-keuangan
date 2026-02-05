@@ -119,21 +119,21 @@ public class SplashActivity extends Activity {
             private Handler handler;
             private Activity activity;
             private boolean executed = false;
+            private int delay;
             
-            NavigationScheduler(Activity act, int delay) {
+            NavigationScheduler(Activity act, int delayMs) {
                 this.activity = act;
+                this.delay = delayMs;
                 this.handler = new Handler(Looper.getMainLooper());
-                
+            }
+            
+            void schedule() {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         navigate();
                     }
                 }, delay);
-            }
-            
-            void schedule() {
-                // Already scheduled in constructor
             }
             
             private void navigate() {
