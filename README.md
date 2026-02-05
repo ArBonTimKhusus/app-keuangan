@@ -1,4 +1,4 @@
-# ArBonKas - Aplikasi Laporan Keuangan
+# ArBonKas 
 
 ![ArBonKas Dashboard](https://github.com/user-attachments/assets/d7d8dca5-8e72-4fda-bedb-95b5660d1a07)
 
