@@ -33,6 +33,15 @@ public class MainActivity extends Activity {
         webSettings.setAllowContentAccess(true);
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         
+        // Optimasi performa dan cache
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setAppCachePath(getCacheDir().getAbsolutePath());
+        
+        // Keamanan tambahan untuk file access
+        webSettings.setAllowFileAccessFromFileURLs(false);
+        webSettings.setAllowUniversalAccessFromFileURLs(false);
+        
         // Set WebView client to handle page navigation
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -40,13 +49,43 @@ public class MainActivity extends Activity {
                 view.loadUrl(url);
                 return true;
             }
+            
+            @Override
+            public void onReceivedError(WebView view, int errorCode, 
+                                        String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+                // Tampilkan pesan error sederhana
+            }
         });
         
         // Set WebChromeClient for additional features
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                // Progress tracking untuk loading indicator di masa depan
+            }
+        });
         
         // Load the main HTML file from assets
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (webView != null) {
+            webView.onPause();
+            webView.pauseTimers();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) {
+            webView.onResume();
+            webView.resumeTimers();
+        }
     }
 
     @Override
