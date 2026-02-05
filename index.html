@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Keuangan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Aplikasi Keuangan</h1>
+            <p>Kelola keuangan Anda dengan mudah</p>
+        </header>
+
+        <!-- Category Management Section -->
+        <section class="category-section">
+            <h2>Kelola Kategori</h2>
+            <div class="category-form">
+                <input type="text" id="categoryInput" placeholder="Nama kategori baru...">
+                <button onclick="addCategory()">Tambah Kategori</button>
+            </div>
+            <div id="categoryList" class="category-list"></div>
+        </section>
+
+        <!-- Financial Records Section -->
+        <section class="records-section">
+            <h2>Catatan Keuangan</h2>
+            <div class="record-form">
+                <div class="form-row">
+                    <input type="date" id="recordDate" required>
+                    <select id="recordType">
+                        <option value="pemasukan">Pemasukan</option>
+                        <option value="pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <select id="recordCategory">
+                        <option value="">Pilih Kategori</option>
+                    </select>
+                    <input type="number" id="recordAmount" placeholder="Jumlah (Rp)" required>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="recordDescription" placeholder="Deskripsi...">
+                    <button onclick="addRecord()">Tambah Catatan</button>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="export-section">
+                <h3>Ekspor Data</h3>
+                <div class="export-buttons">
+                    <button onclick="exportToPDF()" class="export-btn pdf">📄 PDF</button>
+                    <button onclick="exportToExcel()" class="export-btn excel">📊 Excel</button>
+                    <button onclick="exportToWord()" class="export-btn word">📝 Word</button>
+                    <button onclick="exportToPPT()" class="export-btn ppt">📽️ PowerPoint</button>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary">
+                <div class="summary-item pemasukan">
+                    <h3>Total Pemasukan</h3>
+                    <p id="totalPemasukan">Rp 0</p>
+                </div>
+                <div class="summary-item pengeluaran">
+                    <h3>Total Pengeluaran</h3>
+                    <p id="totalPengeluaran">Rp 0</p>
+                </div>
+                <div class="summary-item saldo">
+                    <h3>Saldo</h3>
+                    <p id="saldo">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Records Table -->
+            <div class="records-table">
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Kategori</th>
+                            <th>Tipe</th>
+                            <th>Deskripsi</th>
+                            <th>Jumlah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- External Libraries for Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.min.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
