@@ -124,6 +124,62 @@ Aplikasi ini juga bisa di-host gratis di:
 - **Vercel**
 - **Firebase Hosting**
 
+## 📱 Versi Android
+
+### ArBonKas Android Package
+
+Tersedia **package Android** lengkap yang bisa di-build menjadi APK!
+
+📦 **Download**: `arbonkas-android.zip` (27 KB)
+
+#### Fitur Android Package:
+- ✅ **Source Code Lengkap** - Siap di-build dengan Android Studio
+- ✅ **WebView Wrapper** - Native Android app wrapper
+- ✅ **Offline-First** - Bekerja tanpa internet
+- ✅ **LocalStorage** - Data tersimpan aman di device
+- ✅ **Min SDK 21** - Kompatibel dengan Android 5.0+
+- ✅ **Dokumentasi Lengkap** - README dan INSTALL guide
+
+#### Quick Start Android:
+```bash
+# Ekstrak package
+unzip arbonkas-android.zip
+cd android-package
+
+# Build menggunakan Gradle
+./gradlew assembleDebug
+
+# Install ke device Android
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+#### Build di Android Studio:
+1. Extract `arbonkas-android.zip`
+2. Open Android Studio
+3. File > Open > Pilih folder `android-package`
+4. Build > Build Bundle(s) / APK(s) > Build APK(s)
+5. APK tersimpan di `app/build/outputs/apk/debug/`
+
+📖 **Dokumentasi Lengkap**: Lihat `ANDROID-PACKAGE-INFO.md` untuk detail lengkap
+
+#### Apa yang Ada di Package?
+- 📱 MainActivity.java - WebView wrapper
+- 🎨 Android UI resources (layouts, styles, strings)
+- 📦 Web assets (HTML, CSS, JS)
+- ⚙️ Build configuration (Gradle)
+- 📚 Dokumentasi lengkap (README, INSTALL guide)
+- 🔧 ProGuard rules untuk optimization
+
+#### Persyaratan Build:
+- Android Studio Arctic Fox atau lebih baru
+- JDK 8+
+- Android SDK API Level 33
+
+#### Persyaratan Runtime:
+- Android 5.0 (API 21) atau lebih tinggi
+- 50 MB storage
+- Tidak perlu internet connection
+
 ## 💡 Tips Penggunaan
 
 1. **Backup Data**: Export data secara berkala untuk backup
