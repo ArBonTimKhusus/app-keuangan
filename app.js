@@ -76,10 +76,20 @@ function renderCategories() {
     categories.forEach(category => {
         const tag = document.createElement('div');
         tag.className = 'category-tag';
-        tag.innerHTML = `
-            <span>${category}</span>
-            <button class="delete-btn" onclick="deleteCategory('${category}')">×</button>
-        `;
+        
+        const span = document.createElement('span');
+        span.textContent = category;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '×';
+        deleteBtn.setAttribute('data-category', category);
+        deleteBtn.addEventListener('click', function() {
+            deleteCategory(this.getAttribute('data-category'));
+        });
+        
+        tag.appendChild(span);
+        tag.appendChild(deleteBtn);
         categoryList.appendChild(tag);
     });
 }
@@ -149,14 +159,42 @@ function renderRecords() {
     
     records.forEach(record => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${formatDate(record.date)}</td>
-            <td>${record.category}</td>
-            <td><span class="type-badge ${record.type}">${record.type}</span></td>
-            <td>${record.description || '-'}</td>
-            <td>${formatCurrency(record.amount)}</td>
-            <td><button class="delete-record-btn" onclick="deleteRecord(${record.id})">Hapus</button></td>
-        `;
+        
+        const tdDate = document.createElement('td');
+        tdDate.textContent = formatDate(record.date);
+        
+        const tdCategory = document.createElement('td');
+        tdCategory.textContent = record.category;
+        
+        const tdType = document.createElement('td');
+        const typeBadge = document.createElement('span');
+        typeBadge.className = `type-badge ${record.type}`;
+        typeBadge.textContent = record.type;
+        tdType.appendChild(typeBadge);
+        
+        const tdDescription = document.createElement('td');
+        tdDescription.textContent = record.description || '-';
+        
+        const tdAmount = document.createElement('td');
+        tdAmount.textContent = formatCurrency(record.amount);
+        
+        const tdAction = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-record-btn';
+        deleteBtn.textContent = 'Hapus';
+        deleteBtn.setAttribute('data-record-id', record.id);
+        deleteBtn.addEventListener('click', function() {
+            deleteRecord(parseInt(this.getAttribute('data-record-id')));
+        });
+        tdAction.appendChild(deleteBtn);
+        
+        tr.appendChild(tdDate);
+        tr.appendChild(tdCategory);
+        tr.appendChild(tdType);
+        tr.appendChild(tdDescription);
+        tr.appendChild(tdAmount);
+        tr.appendChild(tdAction);
+        
         tbody.appendChild(tr);
     });
 }
@@ -190,7 +228,8 @@ function formatCurrency(amount) {
 }
 
 function formatDate(dateStr) {
-    const date = new Date(dateStr);
+    // Add time component to avoid timezone issues with YYYY-MM-DD format
+    const date = new Date(dateStr + 'T00:00:00');
     return new Intl.DateTimeFormat('id-ID', {
         day: '2-digit',
         month: 'long',
