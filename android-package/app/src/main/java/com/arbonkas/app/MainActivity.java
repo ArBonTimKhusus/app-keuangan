@@ -35,7 +35,6 @@ public class MainActivity extends Activity {
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         
         // Enable localStorage
-        webSettings.setDomStorageEnabled(true);
         String databasePath = this.getApplicationContext().getDir("databases", MODE_PRIVATE).getPath();
         webSettings.setDatabasePath(databasePath);
         
