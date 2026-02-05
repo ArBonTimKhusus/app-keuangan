@@ -2,8 +2,18 @@
 let categories = [];
 let records = [];
 
+// Performance & UX enhancements
+let writeScheduler = null;
+let moneyFormatter = null;
+let dateFormatter = null;
+const maxRecordsDisplay = 1000;
+const writeDelay = 500;
+const backupInterval = 300000;
+const notifyDuration = 3000;
+
 // Load data from localStorage on page load
 window.addEventListener('DOMContentLoaded', () => {
+    initializeFormatters();
     loadData();
     renderCategories();
     updateCategoryDropdown();
@@ -12,7 +22,37 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Set today's date as default
     document.getElementById('recordDate').valueAsDate = new Date();
+    
+    // Setup auto-backup
+    setInterval(createBackupSnapshot, backupInterval);
+    
+    // Keyboard shortcut for manual backup
+    document.addEventListener('keydown', handleKeyboardShortcut);
+    
+    // Add CSS for notifications dynamically
+    injectNotificationStyles();
 });
+
+function initializeFormatters() {
+    moneyFormatter = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    });
+    
+    dateFormatter = new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+
+function handleKeyboardShortcut(evt) {
+    if (evt.ctrlKey && evt.key === 's') {
+        evt.preventDefault();
+        createBackupSnapshot();
+    }
+}
 
 // Load data from localStorage
 function loadData() {
@@ -32,46 +72,126 @@ function loadData() {
     }
 }
 
-// Save data to localStorage
+// Save data to localStorage with debouncing
 function saveData() {
-    localStorage.setItem('categories', JSON.stringify(categories));
-    localStorage.setItem('records', JSON.stringify(records));
+    if (writeScheduler) clearTimeout(writeScheduler);
+    
+    writeScheduler = setTimeout(() => {
+        try {
+            localStorage.setItem('categories', JSON.stringify(categories));
+            localStorage.setItem('records', JSON.stringify(records));
+        } catch (storageError) {
+            if (storageError.name === 'QuotaExceededError') {
+                displayNotification('Penyimpanan penuh! Hapus catatan lama.', 'error');
+            } else {
+                displayNotification('Gagal menyimpan data', 'error');
+            }
+        }
+    }, writeDelay);
 }
 
-// Category Management
+// Backup and restore functions
+function createBackupSnapshot() {
+    try {
+        const snapshotData = {
+            timestamp: new Date().toISOString(),
+            categories: categories,
+            records: records
+        };
+        localStorage.setItem('arbonkas_backup', JSON.stringify(snapshotData));
+        displayNotification('Backup tersimpan', 'success');
+        return true;
+    } catch (err) {
+        displayNotification('Gagal membuat backup', 'error');
+        return false;
+    }
+}
+
+function restoreFromBackup() {
+    try {
+        const backupData = localStorage.getItem('arbonkas_backup');
+        if (!backupData) {
+            displayNotification('Tidak ada backup tersedia', 'info');
+            return false;
+        }
+        
+        const snapshot = JSON.parse(backupData);
+        categories = snapshot.categories;
+        records = snapshot.records;
+        saveData();
+        
+        renderCategories();
+        updateCategoryDropdown();
+        renderRecords();
+        updateSummary();
+        
+        displayNotification('Backup berhasil dipulihkan', 'success');
+        return true;
+    } catch (err) {
+        displayNotification('Gagal memulihkan backup', 'error');
+        return false;
+    }
+}
+
+// Expose backup functions globally
+window.StorageManager = {
+    createBackup: createBackupSnapshot,
+    restoreBackup: restoreFromBackup
+};
+
+// Category Management with validation
 function addCategory() {
     const input = document.getElementById('categoryInput');
     const categoryName = input.value.trim();
     
-    if (!categoryName) {
-        alert('Nama kategori tidak boleh kosong!');
+    // Input sanitization
+    const sanitized = sanitizeText(categoryName);
+    
+    // Validation
+    if (!sanitized) {
+        displayNotification('Nama kategori tidak boleh kosong!', 'error');
         return;
     }
     
-    if (categories.includes(categoryName)) {
-        alert('Kategori sudah ada!');
+    if (sanitized.length > 50) {
+        displayNotification('Nama kategori maksimal 50 karakter!', 'error');
         return;
     }
     
-    categories.push(categoryName);
+    if (categories.includes(sanitized)) {
+        displayNotification('Kategori sudah ada!', 'error');
+        return;
+    }
+    
+    categories.push(sanitized);
     saveData();
     renderCategories();
     updateCategoryDropdown();
     input.value = '';
+    displayNotification('Kategori berhasil ditambahkan', 'success');
 }
 
 function deleteCategory(categoryName) {
+    // Check if category is in use
+    const isInUse = records.some(rec => rec.category === categoryName);
+    if (isInUse) {
+        displayNotification('Kategori masih digunakan pada catatan!', 'error');
+        return;
+    }
+    
     if (confirm(`Hapus kategori "${categoryName}"?`)) {
         categories = categories.filter(cat => cat !== categoryName);
         saveData();
         renderCategories();
         updateCategoryDropdown();
+        displayNotification('Kategori berhasil dihapus', 'success');
     }
 }
 
+// Render categories with DocumentFragment for performance
 function renderCategories() {
     const categoryList = document.getElementById('categoryList');
-    categoryList.innerHTML = '';
+    const batch = document.createDocumentFragment();
     
     categories.forEach(category => {
         const tag = document.createElement('div');
@@ -90,20 +210,87 @@ function renderCategories() {
         
         tag.appendChild(span);
         tag.appendChild(deleteBtn);
-        categoryList.appendChild(tag);
+        batch.appendChild(tag);
     });
+    
+    categoryList.innerHTML = '';
+    categoryList.appendChild(batch);
 }
 
 function updateCategoryDropdown() {
     const select = document.getElementById('recordCategory');
-    select.innerHTML = '<option value="">Pilih Kategori</option>';
+    const batch = document.createDocumentFragment();
+    
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Pilih Kategori';
+    batch.appendChild(defaultOpt);
     
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
-        select.appendChild(option);
+        batch.appendChild(option);
     });
+    
+    select.innerHTML = '';
+    select.appendChild(batch);
+}
+
+// Record Management with enhanced validation
+function addRecord() {
+    const date = document.getElementById('recordDate').value;
+    const type = document.getElementById('recordType').value;
+    const category = document.getElementById('recordCategory').value;
+    const amount = parseFloat(document.getElementById('recordAmount').value);
+    const description = document.getElementById('recordDescription').value.trim();
+    
+    // Validation
+    if (!date || !category) {
+        displayNotification('Mohon lengkapi tanggal dan kategori!', 'error');
+        return;
+    }
+    
+    if (!amount || amount <= 0) {
+        displayNotification('Jumlah harus lebih dari 0!', 'error');
+        return;
+    }
+    
+    if (amount > 999999999999) {
+        displayNotification('Jumlah terlalu besar!', 'error');
+        return;
+    }
+    
+    const record = {
+        id: generateUniqueId(),
+        date,
+        type,
+        category,
+        amount,
+        description: sanitizeText(description)
+    };
+    
+    records.unshift(record);
+    saveData();
+    renderRecords();
+    updateSummary();
+    
+    // Reset form
+    document.getElementById('recordAmount').value = '';
+    document.getElementById('recordDescription').value = '';
+    document.getElementById('recordCategory').value = '';
+    
+    displayNotification('Catatan berhasil ditambahkan', 'success');
+}
+
+function deleteRecord(id) {
+    if (confirm('Hapus catatan ini?')) {
+        records = records.filter(record => record.id !== id);
+        saveData();
+        renderRecords();
+        updateSummary();
+        displayNotification('Catatan berhasil dihapus', 'success');
+    }
 }
 
 // Record Management
@@ -148,16 +335,20 @@ function deleteRecord(id) {
     }
 }
 
+// Render records with lazy loading
 function renderRecords() {
     const tbody = document.getElementById('recordsBody');
-    tbody.innerHTML = '';
     
     if (records.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">Belum ada catatan keuangan</td></tr>';
         return;
     }
     
-    records.forEach(record => {
+    const batch = document.createDocumentFragment();
+    const displayLimit = Math.min(records.length, maxRecordsDisplay);
+    
+    for (let i = 0; i < displayLimit; i++) {
+        const record = records[i];
         const tr = document.createElement('tr');
         
         const tdDate = document.createElement('td');
@@ -184,7 +375,7 @@ function renderRecords() {
         deleteBtn.textContent = 'Hapus';
         deleteBtn.setAttribute('data-record-id', record.id);
         deleteBtn.addEventListener('click', function() {
-            deleteRecord(parseInt(this.getAttribute('data-record-id')));
+            deleteRecord(this.getAttribute('data-record-id'));
         });
         tdAction.appendChild(deleteBtn);
         
@@ -195,8 +386,22 @@ function renderRecords() {
         tr.appendChild(tdAmount);
         tr.appendChild(tdAction);
         
-        tbody.appendChild(tr);
-    });
+        batch.appendChild(tr);
+    }
+    
+    tbody.innerHTML = '';
+    tbody.appendChild(batch);
+    
+    // Show info if records are limited
+    if (records.length > maxRecordsDisplay) {
+        const infoRow = document.createElement('tr');
+        const infoCell = document.createElement('td');
+        infoCell.colSpan = 6;
+        infoCell.style.cssText = 'text-align:center;padding:20px;font-style:italic;color:#666;';
+        infoCell.textContent = `Menampilkan ${maxRecordsDisplay} dari ${records.length} catatan`;
+        infoRow.appendChild(infoCell);
+        tbody.appendChild(infoRow);
+    }
 }
 
 function updateSummary() {
