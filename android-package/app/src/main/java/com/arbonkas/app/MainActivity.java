@@ -34,8 +34,6 @@ public class MainActivity extends Activity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         
-        // Enable localStorage
-        
         // Set WebView client to handle page navigation
         webView.setWebViewClient(new WebViewClient() {
             @Override
