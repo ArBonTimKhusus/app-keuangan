@@ -12,7 +12,7 @@ const API = (() => {
     // Base URL - change this for production deployment
     baseURL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:3000/api'
-      : `${window.location.protocol}//${window.location.hostname}/api`,
+      : `https://${window.location.hostname}/api`, // Force HTTPS in production
     
     // Token storage key
     tokenKey: 'arbonkas_auth_token',

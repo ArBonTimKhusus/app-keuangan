@@ -140,12 +140,20 @@ const sleep = (ms) => {
 };
 
 /**
- * Check if date is overdue
+ * Check if date is overdue (compares only date, not time)
  * @param {Date|String} dueDate
  */
 const isOverdue = (dueDate) => {
   if (!dueDate) return false;
-  return new Date(dueDate) < new Date();
+  
+  const due = new Date(dueDate);
+  const today = new Date();
+  
+  // Set both dates to end of day for fair comparison
+  due.setHours(23, 59, 59, 999);
+  today.setHours(23, 59, 59, 999);
+  
+  return due < today;
 };
 
 module.exports = {

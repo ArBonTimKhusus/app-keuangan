@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
  * General rate limiter
  */
 const generalLimiter = rateLimit({
-  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW) || 15) * 60 * 1000, // 15 minutes default
+  windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW) || 15) * 60 * 1000, // Convert minutes to milliseconds
   max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // 100 requests per window
   message: {
     success: false,

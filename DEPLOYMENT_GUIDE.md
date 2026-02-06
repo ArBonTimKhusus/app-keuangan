@@ -318,7 +318,9 @@ DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="/var/backups/arbonkas"
 DB_NAME="arbonkas_db"
 DB_USER="arbonkas_user"
-DB_PASS="Password_Kuat_Anda_123!"
+
+# Read password from .env file (more secure)
+DB_PASS=$(grep DB_PASSWORD /var/www/app-keuangan/backend/.env | cut -d '=' -f2)
 
 # Backup database
 mysqldump -u $DB_USER -p$DB_PASS $DB_NAME | gzip > $BACKUP_DIR/arbonkas_db_$DATE.sql.gz

@@ -5,9 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "migrate": "node -e \"require('./migrations/migrate.js')()\"",
-    "seed": "node -e \"require('./seeders/seed.js')()\""
+    "dev": "nodemon server.js"
   },
   "keywords": [
     "arbonkas",

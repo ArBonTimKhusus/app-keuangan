@@ -9,6 +9,15 @@ const jwtConfig = require('../config/jwt');
 const { success, created, unauthorized, error } = require('../utils/response');
 
 const AuthController = {
+  // Default wallet configuration for new users
+  DEFAULT_WALLET: {
+    name: 'Dompet Utama',
+    icon: 'wallet',
+    balance: 0,
+    color: '#4CAF50',
+    is_default: true
+  },
+
   /**
    * Register a new user
    */
@@ -28,7 +37,14 @@ const AuthController = {
       // Create default wallet for new user
       await query(
         'INSERT INTO wallets (user_id, name, icon, balance, color, is_default) VALUES (?, ?, ?, ?, ?, ?)',
-        [user.id, 'Dompet Utama', 'wallet', 0, '#4CAF50', true]
+        [
+          user.id, 
+          AuthController.DEFAULT_WALLET.name,
+          AuthController.DEFAULT_WALLET.icon,
+          AuthController.DEFAULT_WALLET.balance,
+          AuthController.DEFAULT_WALLET.color,
+          AuthController.DEFAULT_WALLET.is_default
+        ]
       );
       
       return created(res, user, 'Registrasi berhasil');
