@@ -1046,7 +1046,7 @@ body::before {
     background: #ff9800;
 }
 
-@animationslideInUp {
+@keyframes slideInUp {
     from {
         transform: translateY(100%);
         opacity: 0;
