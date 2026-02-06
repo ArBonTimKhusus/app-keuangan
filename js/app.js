@@ -666,9 +666,8 @@ const UIManager = {
             const success = await TransactionManager.deleteTransaction(id);
             if (success) {
                 UIManager.refreshCurrentPage();
-                if (AppState.currentPage === 'dashboard') {
-                    UIManager.renderDashboard();
-                }
+                // Always update dashboard stats
+                UIManager.renderDashboard();
             }
         }
     },
@@ -900,9 +899,8 @@ const EventHandlers = {
 
                 UIManager.closeModal('transaction-modal');
                 UIManager.refreshCurrentPage();
-                if (AppState.currentPage !== 'dashboard') {
-                    UIManager.renderDashboard();
-                }
+                // Always update dashboard stats even if we're on another page
+                UIManager.renderDashboard();
             } catch (error) {
                 console.error('Error saving transaction:', error);
             }
