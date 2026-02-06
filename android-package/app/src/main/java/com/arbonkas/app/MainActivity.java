@@ -34,7 +34,6 @@ public class MainActivity extends Activity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         
         // Optimasi performa dan cache
-        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSettings.setAppCacheEnabled(true);
         webSettings.setAppCachePath(getCacheDir().getAbsolutePath());
         
