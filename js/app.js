@@ -44,6 +44,14 @@ const Utils = {
         return Date.now().toString(36) + Math.random().toString(36).substring(2);
     },
 
+    // Escape HTML to prevent XSS
+    escapeHtml: (str) => {
+        if (str == null) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    },
+
     // Get date range based on period
     getDateRange: (period) => {
         const today = new Date();
@@ -80,7 +88,19 @@ const Utils = {
 
 // Local Storage Manager
 const Storage = {
+    _isAvailable: (() => {
+        try {
+            const test = '__storage_test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    })(),
+
     save: (key, data) => {
+        if (!Storage._isAvailable) return false;
         try {
             localStorage.setItem(key, JSON.stringify(data));
             return true;
@@ -91,6 +111,7 @@ const Storage = {
     },
 
     load: (key) => {
+        if (!Storage._isAvailable) return null;
         try {
             const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : null;
@@ -101,6 +122,7 @@ const Storage = {
     },
 
     clear: (key) => {
+        if (!Storage._isAvailable) return false;
         try {
             localStorage.removeItem(key);
             return true;
@@ -358,14 +380,14 @@ const UIManager = {
             recentList.innerHTML = '<p class="empty-state">Belum ada transaksi</p>';
         } else {
             recentList.innerHTML = recentTransactions.map(t => `
-                <div class="transaction-item ${t.type}">
+                <div class="transaction-item ${Utils.escapeHtml(t.type)}">
                     <div class="transaction-info">
-                        <div class="transaction-category">${t.category}</div>
+                        <div class="transaction-category">${Utils.escapeHtml(t.category)}</div>
                         <div class="transaction-details">
-                            ${Utils.formatDate(t.date)} • ${t.note || 'Tidak ada catatan'}
+                            ${Utils.formatDate(t.date)} • ${Utils.escapeHtml(t.note) || 'Tidak ada catatan'}
                         </div>
                     </div>
-                    <div class="transaction-amount ${t.type}">
+                    <div class="transaction-amount ${Utils.escapeHtml(t.type)}">
                         ${t.type === 'income' ? '+' : '-'} ${Utils.formatCurrency(t.amount)}
                     </div>
                 </div>
@@ -387,21 +409,21 @@ const UIManager = {
                 const walletName = wallet ? wallet.name : 'Unknown';
 
                 return `
-                    <div class="transaction-item ${t.type}">
+                    <div class="transaction-item ${Utils.escapeHtml(t.type)}">
                         <div class="transaction-info">
-                            <div class="transaction-category">${t.category}</div>
+                            <div class="transaction-category">${Utils.escapeHtml(t.category)}</div>
                             <div class="transaction-details">
-                                ${Utils.formatDate(t.date)} • ${walletName} • ${t.note || 'Tidak ada catatan'}
+                                ${Utils.formatDate(t.date)} • ${Utils.escapeHtml(walletName)} • ${Utils.escapeHtml(t.note) || 'Tidak ada catatan'}
                             </div>
                         </div>
-                        <div class="transaction-amount ${t.type}">
+                        <div class="transaction-amount ${Utils.escapeHtml(t.type)}">
                             ${t.type === 'income' ? '+' : '-'} ${Utils.formatCurrency(t.amount)}
                         </div>
                         <div class="transaction-actions">
-                            <button onclick="UIManager.editTransaction('${t.id}')" title="Edit">
+                            <button onclick="UIManager.editTransaction('${Utils.escapeHtml(t.id)}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="UIManager.deleteTransaction('${t.id}')" title="Hapus">
+                            <button class="delete-btn" onclick="UIManager.deleteTransaction('${Utils.escapeHtml(t.id)}')" title="Hapus">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -424,10 +446,10 @@ const UIManager = {
                     <div class="wallet-card">
                         <div class="wallet-header">
                             <div class="wallet-icon">
-                                <i class="fas fa-${w.icon}"></i>
+                                <i class="fas fa-${Utils.escapeHtml(w.icon)}"></i>
                             </div>
                         </div>
-                        <div class="wallet-name">${w.name}</div>
+                        <div class="wallet-name">${Utils.escapeHtml(w.name)}</div>
                         <div class="wallet-balance">${Utils.formatCurrency(balance)}</div>
                     </div>
                 `;
@@ -440,8 +462,9 @@ const UIManager = {
 
     updateWalletOptions: () => {
         const select = document.getElementById('transaction-wallet');
+        if (!select) return;
         select.innerHTML = '<option value="">Pilih Dompet</option>' +
-            AppState.wallets.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+            AppState.wallets.map(w => `<option value="${Utils.escapeHtml(w.id)}">${Utils.escapeHtml(w.name)}</option>`).join('');
     },
 
     // Loans
@@ -457,15 +480,15 @@ const UIManager = {
             receivablesList.innerHTML = receivables.map(l => `
                 <div class="loan-item">
                     <div class="loan-header">
-                        <div class="loan-name">${l.name}</div>
+                        <div class="loan-name">${Utils.escapeHtml(l.name)}</div>
                         <div class="loan-amount receivable">+ ${Utils.formatCurrency(l.amount)}</div>
                     </div>
                     <div class="loan-details">
                         Tanggal: ${Utils.formatDate(l.date)}
                         ${l.dueDate ? ` • Jatuh Tempo: ${Utils.formatDate(l.dueDate)}` : ''}
                     </div>
-                    ${l.note ? `<div class="loan-details">${l.note}</div>` : ''}
-                    <span class="loan-status ${l.status}">${l.status === 'active' ? 'Aktif' : 'Lunas'}</span>
+                    ${l.note ? `<div class="loan-details">${Utils.escapeHtml(l.note)}</div>` : ''}
+                    <span class="loan-status ${Utils.escapeHtml(l.status)}">${l.status === 'active' ? 'Aktif' : 'Lunas'}</span>
                 </div>
             `).join('');
         }
@@ -478,15 +501,15 @@ const UIManager = {
             payablesList.innerHTML = payables.map(l => `
                 <div class="loan-item">
                     <div class="loan-header">
-                        <div class="loan-name">${l.name}</div>
+                        <div class="loan-name">${Utils.escapeHtml(l.name)}</div>
                         <div class="loan-amount payable">- ${Utils.formatCurrency(l.amount)}</div>
                     </div>
                     <div class="loan-details">
                         Tanggal: ${Utils.formatDate(l.date)}
                         ${l.dueDate ? ` • Jatuh Tempo: ${Utils.formatDate(l.dueDate)}` : ''}
                     </div>
-                    ${l.note ? `<div class="loan-details">${l.note}</div>` : ''}
-                    <span class="loan-status ${l.status}">${l.status === 'active' ? 'Aktif' : 'Lunas'}</span>
+                    ${l.note ? `<div class="loan-details">${Utils.escapeHtml(l.note)}</div>` : ''}
+                    <span class="loan-status ${Utils.escapeHtml(l.status)}">${l.status === 'active' ? 'Aktif' : 'Lunas'}</span>
                 </div>
             `).join('');
         }
@@ -523,7 +546,8 @@ const UIManager = {
         document.getElementById('transaction-note').value = transaction.note || '';
         
         // Set type radio
-        document.querySelector(`input[name="type"][value="${transaction.type}"]`).checked = true;
+        const typeRadio = document.querySelector(`input[name="type"][value="${transaction.type}"]`);
+        if (typeRadio) typeRadio.checked = true;
         
         document.getElementById('transaction-modal-title').textContent = 'Edit Transaksi';
         UIManager.openModal('transaction-modal');
@@ -595,14 +619,14 @@ const UIManager = {
                 const walletName = wallet ? wallet.name : 'Unknown';
 
                 return `
-                    <div class="transaction-item ${t.type}">
+                    <div class="transaction-item ${Utils.escapeHtml(t.type)}">
                         <div class="transaction-info">
-                            <div class="transaction-category">${t.category}</div>
+                            <div class="transaction-category">${Utils.escapeHtml(t.category)}</div>
                             <div class="transaction-details">
-                                ${Utils.formatDate(t.date)} • ${walletName} • ${t.note || 'Tidak ada catatan'}
+                                ${Utils.formatDate(t.date)} • ${Utils.escapeHtml(walletName)} • ${Utils.escapeHtml(t.note) || 'Tidak ada catatan'}
                             </div>
                         </div>
-                        <div class="transaction-amount ${t.type}">
+                        <div class="transaction-amount ${Utils.escapeHtml(t.type)}">
                             ${t.type === 'income' ? '+' : '-'} ${Utils.formatCurrency(t.amount)}
                         </div>
                     </div>
