@@ -96,8 +96,8 @@ public class MainActivity extends Activity {
             String assetLocation = "file:///android_asset/index.html";
 
             try {
-                performanceMetrics.put("loadInitiated", System.currentTimeMillis());
                 contentEngine.loadUrl(assetLocation);
+                performanceMetrics.put("loadInitiated", System.currentTimeMillis());
                 Log.d(ARBONKAS_TRACE, "Loading: " + assetLocation);
             } catch (Exception loadError) {
                 Log.e(ARBONKAS_TRACE, "Load error: " + loadError.toString());
@@ -253,6 +253,8 @@ public class MainActivity extends Activity {
         WebView engine = webConfig != null ? webConfig.getEngine() : null;
         if (engine != null) {
             engine.clearCache(true);
+            engine.clearHistory();
+            engine.clearFormData();
         }
     }
 
