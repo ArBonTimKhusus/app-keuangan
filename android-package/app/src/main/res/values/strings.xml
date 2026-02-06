@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">ArBonKas</string>
     <string name="app_description">Aplikasi Laporan Keuangan</string>
+    <string name="app_description">Financial Reporting for ArBon Carbon Modification</string>
 </resources>

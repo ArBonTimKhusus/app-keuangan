@@ -7,5 +7,16 @@
         <item name="android:colorPrimaryDark">#1557b0</item>
         <item name="android:colorAccent">#4285f4</item>
         <item name="android:statusBarColor">#1557b0</item>
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#4CAF50</item>
+        <item name="android:navigationBarColor">#4CAF50</item>
+        <item name="android:windowBackground">@drawable/background_gradient</item>
+    </style>
+
+    <style name="SplashTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FF9800</item>
+        <item name="android:navigationBarColor">#4CAF50</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>

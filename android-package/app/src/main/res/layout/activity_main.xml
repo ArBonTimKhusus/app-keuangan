@@ -7,5 +7,35 @@
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <ImageView
+        android:id="@+id/watermark_logo"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_centerInParent="true"
+        android:alpha="0.08"
+        android:contentDescription="ArBonKas Logo Watermark"
+        android:src="@drawable/arbonkas_logo"
+        android:scaleType="centerInside" />
+
+    <WebView
+        android:id="@+id/financial_content_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <ProgressBar
+        android:id="@+id/load_progress_indicator"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentTop="true"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#4CAF50"
+        android:visibility="gone" />
 
 </RelativeLayout>
