@@ -1,0 +1,19 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+android-package/app/build/
+android-package/build/
+android-package/.gradle/
+*.apk
+*.aab
+
+# Dependencies
+node_modules/
