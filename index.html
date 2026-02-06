@@ -8,8 +8,23 @@
     <link rel="icon" type="image/png" href="ArBonKas_logo_compressed_2MB.png">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api.js"></script>
+    <script>
+        // Authentication check - must be first thing that runs
+        if (!API.auth.isAuthenticated()) {
+            window.location.href = 'login.html';
+        }
+    </script>
 </head>
 <body>
+    <!-- Connection Status Indicator -->
+    <div id="connection-status" class="connection-status"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Memuat data...</p>
+    </div>
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -42,6 +57,16 @@
                     <span>Hutang/Piutang</span>
                 </button>
             </nav>
+            <div class="user-menu">
+                <div class="user-info" id="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">Loading...</span>
+                </div>
+                <div class="dropdown-menu" id="user-dropdown">
+                    <a href="#" id="profile-link"><i class="fas fa-user"></i> Profil</a>
+                    <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -360,9 +385,12 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2026 ArBonKas - <a href="https://www.arboncarbonmodifikasi.com" target="_blank">ArBon Carbon Modifikasi</a></p>
-            <p class="footer-note">Data disimpan lokal di perangkat Anda. Privasi terjamin.</p>
+            <p class="footer-note">Data tersimpan aman di server cloud. Akses dari mana saja.</p>
         </div>
     </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
     <script src="js/app.js"></script>
 </body>
